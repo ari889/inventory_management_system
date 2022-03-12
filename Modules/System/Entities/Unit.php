@@ -2,34 +2,39 @@
 
 namespace Modules\System\Entities;
 
-use Illuminate\Support\Facades\Cache;
 use Modules\Base\Entities\BaseModel;
+use Illuminate\Support\Facades\Cache;
 
-class CustomerGroup extends BaseModel
+class Unit extends BaseModel
 {
-    protected $fillable = ['group_name', 'percentage', 'status', 'created_by', 'updated_by'];
+    protected $fillable = ['unit_code', 'unit_name', 'base_unit', 'operator', 'operation_value', 'status', 'created_by', 'updated_by'];
 
-    protected $group_name;
+    public function baseUnit(){
+        return $this->belongsTo(Unit::class, 'base_unit', 'id')->withDefault(['unit_name' => 'N/A']);
+    }
 
-    public function setGroupName($group_name){
-        $this->group_name = $group_name;
+
+    protected $unit_name;
+
+    public function setUnitName($unit_name){
+        $this->unit_name = $unit_name;
     }
 
     private function get_datatable_query()
     {
-        if(permission('customer-group-bulk-delete')){
-            $this->column_order = [null, 'id', 'group_name', 'percentage', 'status', null];
+        if(permission('unit-bulk-delete')){
+            $this->column_order = [null, 'id', 'unit_name', 'code', 'base_unit', 'operator', 'operation_value', 'status', null];
         }else{
-            $this->column_order = ['id', 'group_name', 'percentage', 'status', null];
+            $this->column_order = ['id', 'unit_name', 'code', 'base_unit', 'operator', 'operation_value', 'status', null];
         }
 
-        $query = self::toBase();
+        $query = self::with('baseUnit');
 
         /*****************
          * *Search Data **
          ******************/
-        if (!empty($this->group_name)) {
-            $query->where('group_name', 'like', '%' . $this->group_name . '%');
+        if (!empty($this->unit_name)) {
+            $query->where('unit_name', 'like', '%' . $this->unit_name . '%');
         }
         if (isset($this->orderValue) && isset($this->dirValue)) {
             $query->orderBy($this->column_order[$this->orderValue], $this->dirValue);
@@ -65,24 +70,24 @@ class CustomerGroup extends BaseModel
     /**
      * ! set data in cache
      */
-    private const ALL_CUSTOMER_GROUPS = '_all_customer_groups';
-    private const ACTIVE_CUSTOMER_GROUPS = '_active_customer_groups';
+    private const ALL_UNITS = '_all_units';
+    private const ACTIVE_UNITS = '_active_units';
 
-    public static function allCustomerGroups(){
-        return Cache::rememberForever(self::ALL_CUSTOMER_GROUPS, function () {
+    public static function allUnits(){
+        return Cache::rememberForever(self::ALL_UNITS, function () {
             return self::toBase()->get();
         });
     }
 
-    public static function activeCustomerGroups(){
-        return Cache::rememberForever(self::ACTIVE_CUSTOMER_GROUPS, function () {
+    public static function activeUnits(){
+        return Cache::rememberForever(self::ACTIVE_UNITS, function () {
             return self::toBase()->where('status', 1)->get();
         });
     }
 
     public static function flushCache(){
-        Cache::forget(self::ALL_CUSTOMER_GROUPS);
-        Cache::forget(self::ACTIVE_CUSTOMER_GROUPS);
+        Cache::forget(self::ALL_UNITS);
+        Cache::forget(self::ACTIVE_UNITS);
     }
 
     public static function boot(){
