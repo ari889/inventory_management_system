@@ -1,0 +1,8 @@
+{
+    "Base": true,
+    "Category": true,
+    "CategoryFormRequest": true,
+    "System": true,
+    "Supplier": true,
+    "Customer": true
+}

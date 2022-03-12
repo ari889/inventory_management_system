@@ -1,0 +1,348 @@
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+$fa-font-path: '../webfonts';
+
+//flag icon
+@import '~flag-icon-css/css/flag-icons.min.css';
+@import './../asset/css/gaxon-icon/style.css';
+@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+@import './../asset/css/lite-style-1.min.css';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import '~bootstrap-select/dist/css/bootstrap-select.min.css';
+@import '~dropify/dist/css/dropify.min.css';
+@import '~nestable2/jquery.nestable.css';
+
+/**
+* custom css
+*/
+.close {
+    opacity: 100% !important;
+    color: #fff !important;
+    font-size: 30px !important;
+}
+
+.table th {
+    color: #fff !important;
+}
+
+.table th,
+.table td {
+    padding: 1rem !important;
+}
+
+.required label:first-child::after {
+    content: '*';
+    color: #dc3545;
+}
+
+.swal2-popup.swal2-toast {
+    padding: 1em !important;
+}
+
+.swal2-popup .swal2-title {
+    display: block;
+    position: relative;
+    max-width: 100%;
+    margin: 0 !important;
+    padding: 0;
+    font-size: 1.8rem !important;
+    font-weight: 600;
+    text-align: center;
+    text-transform: none;
+    word-wrap: break-word;
+}
+
+.swal2-popup .swal2-action {
+    margin: 0 !important;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+    flex-grow: 1;
+    justify-content: flex-start;
+}
+
+#dataTable .custom-control-input:checked~.custom-control-label::before {
+    color: #fff !important;
+    border-color: #f5282c !important;
+    background: #f75e22 !important;
+    box-shadow: none !important;
+}
+
+div.dt-button-collection.dropdown-menu {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-direction: column !important;
+    background-color: #fa8c16 !important;
+}
+
+.dt-button.dropdown-item.button-columnVisiblity.active {
+    color: #fff !important;
+}
+
+.dt-button.dropdown-item.active {
+    background-color: #fa8c16 !important;
+}
+
+.dt-button.dropdown-item.button-columnVisiblity {
+    color: #000 !important;
+    padding: 5px 10px !important;
+}
+
+.dataTables_processing {
+    position: absolute;
+    top: 100px !important;
+    left: 50% !important;
+}
+
+.mr-10 {
+    margin-right: 10px !important;
+}
+
+.ml-10 {
+    margin-left: 10px !important;
+}
+
+.dt-buttons .btn-secondary {
+    margin-left: 5px !important;
+    margin-bottom: 5px !important;
+}
+
+.dt-buttons .btn-secondary:last-child {
+    margin-right: 0 !important;
+}
+
+#save-btn {
+    width: 90px;
+}
+
+.kt-spinner {
+    position: relative;
+}
+
+.kt-spinner::before {
+    content: '';
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    border-radius: 50%;
+}
+
+.kt-spinner::before {
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+
+}
+
+.kt-spinner::before {
+    -webkit-animation: kt-spinner .5s linear infinite;
+    animation: kt-spinner .5s linear infinite;
+}
+
+.kt-spinner.kt-spinner--light::before {
+    border: 2px solid #fff;
+    border-right: 2px solid transparent;
+}
+
+@-webkit-keyframes kt-spinner {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes kt-spinner {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+
+.btn-light,
+.btn-light:hover {
+    color: #545454;
+    background-color: #fff !important;
+    border-color: #ced4da;
+}
+
+.dropdown-item {
+    cursor: pointer !important;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    color: #fff !important;
+    background-color: #fa8c16 !important;
+}
+
+
+//Menu builder
+.menu-builder .dd {
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    max-width: inherit;
+    list-style: none;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.menu-builder .dd .item_action {
+    z-index: 10;
+    position: relative;
+    top: 9px;
+    right: 10px;
+}
+
+.menu-builder .dd .item_action .edit {
+    margin-right: 5px;
+}
+
+.menu-builder .dd-handle {
+    display: block;
+    height: 50px;
+    margin: 5px 0;
+    padding: 14px 25px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    border-radius: 3px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+}
+
+.pt-24 {
+    padding-top: 24px !important;
+}
+
+.btn-secondary {
+    color: white !important;
+}
+
+/************************
+Begin :: Permission tree
+****************************/
+#permission.tree,
+#permission.tree ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+#permission.tree ul {
+    margin-left: 0.5em !important;
+    position: relative;
+}
+
+#permission.tree ul ul {
+    margin-left: 0.5em !important;
+}
+
+#permission.tree ul:before {
+    content: "";
+    display: block;
+    width: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    border-left: 1px solid;
+}
+
+#permission.tree li {
+    margin: 0 0 10px 0;
+    padding: 1rem 0 1rem 1rem;
+    line-height: 2em;
+    font-weight: 700;
+    position: relative;
+    border-left: 2px solid #038fde;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#permission.tree li:hover {
+    box-shadow: none !important;
+}
+
+#permission.tree li li {
+    margin: 0;
+    padding: 0 0 0 1em;
+    line-height: 2em;
+    font-weight: 700;
+    position: relative;
+    border-left: 0;
+    box-shadow: none !important;
+}
+
+#permission.tree ul li:before {
+    content: "";
+    display: block;
+    widows: 10px;
+    height: 0;
+    border-top: 1px solid;
+    margin-top: -1px;
+    position: absolute;
+    top: 1em;
+    left: 0;
+}
+
+#permission.tree ul li:last-child:before {
+    background: #fff;
+    height: auto;
+    top: 1em;
+    bottom: 0;
+}
+
+.indicator {
+    margin-right: 5px;
+}
+
+#permission.tree li button,
+#permission.tree li button:active,
+#permission.tree li button:focus {
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    outline: 0;
+}
+
+#permission.tree li .indicator {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    color: #038fde;
+    font-size: 18px;
+    float: right;
+    line-height: 30px;
+    cursor: pointer;
+}
+
+#permission.tree li li .indicator {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    color: #c38fde;
+    font-size: 18px;
+    float: right;
+    line-height: 30px;
+    cursor: pointer;
+}
+
+#permission.tree input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+
+
+/************************
+End :: Permission tree
+****************************/
