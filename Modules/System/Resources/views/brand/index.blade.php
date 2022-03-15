@@ -156,7 +156,7 @@ $(document).ready(function(){
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7' <'float-right'p>>>",
 
             "buttons": [
-                @if (permission('category-report'))
+                @if (permission('brand-report'))
                 {
                     'extend' : 'colvis',
                     'className' : 'btn btn-secondary btn-sm text-white',

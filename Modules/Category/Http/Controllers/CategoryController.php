@@ -4,7 +4,7 @@ namespace Modules\Category\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Modules\Category\Entities\Category;
-use App\Http\Controllers\BaseController;
+use Modules\Base\Http\Controllers\BaseController;
 use Modules\Category\Http\Requests\CategoryFormRequest;
 
 class CategoryController extends BaseController
