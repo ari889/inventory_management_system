@@ -31,7 +31,7 @@ class ProductController extends BaseController
                 'units' => Unit::all(),
                 'taxes' => Tax::all(),
             ];
-            return view('product::.index', $data);
+            return view('product::index', $data);
         }else{
             return $this->unauthorized_access_blocked();
         }
@@ -108,7 +108,7 @@ class ProductController extends BaseController
                 $collection = collect($request->validated())->except(['image', 'qty', 'alert_qty']);
                 $qty = $request->qty ? $request->qty : null;
                 $alert_qty = $request->alert_qty ? $request->alert_qty : null;
-                $collection = $this->track_data($request->update_id,$collection);
+                $collection = $this->track_data($collection, $request->update_id);
                 $image = $request->old_image;
                 if($request->hasFile('image')){
                     $image = $this->upload_file($request->file('image'),PRODUCT_IMAGE_PATH);
@@ -212,11 +212,12 @@ class ProductController extends BaseController
     }
 
     public function generate_code(){
-        return Keygen::numeric()->generate();
+        return Keygen::numeric(8)->generate();
     }
 
     public function populate_unit($id){
         $units = Unit::where('base_unit', $id)->orWhere('id', $id)->pluck('unit_name', 'id');
         return json_encode($units);
     }
+
 }

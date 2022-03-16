@@ -13,11 +13,11 @@ define('STATUS_LABEL', ['1' => '<span class="badge badge-success">Active</span>'
 define('MAIL_MAILER', ['sendmal', 'mail', 'smtp']);
 define('MAIL_ENCRYPTION', ['none' => 'null', 'tls' => 'tls', 'ssl' => 'ssl']);
 define('BARCODE_SYMBOLOGY', [
-    'c128'  => 'Code 128',
-    'c39'   => 'Code 39',
+    'C128'  => 'Code 128',
+    'C39'   => 'Code 39',
     'UPCA'  => 'UPC-A',
-    'UPCB'  => 'UPC-B',
-    'EANB'  => 'EAN-B',
+    'UPCE'  => 'UPC-E',
+    'EAN8'  => 'EAN-8',
     'EAN13' => 'EAN-13',
 ]);
 

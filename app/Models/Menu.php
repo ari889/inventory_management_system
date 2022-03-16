@@ -14,6 +14,6 @@ class Menu extends Model
     protected $fillable = ['menu_name', 'deletable'];
 
     public function menuItems(){
-        return $this->hasMany(Module::class)->doesntHave('parent')->orderBy('order', 'asc');
+        return $this->hasMany(Module::class)->doesntHave('parent')->orderBy('order','asc');
     }
 }
