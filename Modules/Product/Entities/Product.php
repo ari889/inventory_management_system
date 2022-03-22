@@ -33,7 +33,7 @@ class Product extends BaseModel
     }
 
     public function tax(){
-        return $this->belongsTo(Tax::class)->withDefault(['name' => 'No tax']);
+        return $this->belongsTo(Tax::class)->withDefault(['name' => 'No tax', 'rate' => 0]);
     }
 
     protected $name;

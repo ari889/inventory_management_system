@@ -72,16 +72,14 @@ class UnitController extends BaseController
     public function store_or_update_data(UnitFormRequest $request){
         if($request->ajax()){
             if(permission('unit-add') || permission('unit-edit')){
-                $collection = collect($request->validated())->except(['operator', 'operation_value']);
-                if($request->operator){
-                    $collection = $collection->merge(['operator' => $request->operator]);
-                }
-                if($request->operation_value){
-                    $collection = $collection->merge(['operation_value' => $request->operation_value]);
-                }
-                $collection = $this->track_data($request->update_id, $collection);
-                $result     = $this->model->updateOrCreate(['id' => $request->update_id], $collection->all());
-                $output     = $this->store_message($result, $request->update_id);
+                $collection      = collect($request->validated())->except(['operator', 'operation_value']);
+                $base_unit       = $request->base_unit ? $request->base_unit : null;
+                $operator        = $request->operator ? $request->operator : '*';
+                $operation_value = $request->operation_value ? $request->operation_value : 1;
+                $collection      = $collection->merge(compact('base_unit', 'operator', 'operation_value'));
+                $collection      = $this->track_data($request->update_id, $collection);
+                $result          = $this->model->updateOrCreate(['id' => $request->update_id], $collection->all());
+                $output          = $this->store_message($result, $request->update_id);
             }else{
                 $output = $this->access_blocked();
             }

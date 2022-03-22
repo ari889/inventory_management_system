@@ -30,5 +30,8 @@ Route::group(['middleware' => ['auth']], function(){
     // for barcode
     Route::get('print-barcode', 'BarcodeController@index');
     Route::post('generate-barcode', 'BarcodeController@generateBarcode')->name('generate.barcode');
+
+    Route::post('product-autocomplete-search', 'ProductController@product_autocomplete_search');
+    Route::post('product-search', 'ProductController@search_product');
 });
 

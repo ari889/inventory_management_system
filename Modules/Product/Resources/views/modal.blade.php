@@ -74,23 +74,23 @@
                             <x-form.selectbox labelName="Sale Unit" name="sale_unit_id" required="required" col="col-md-6"
                                 class="selectpicker"></x-form.selectbox>
 
-                                <x-form.textbox labelName="Cost" name="cost" required="required" col="col-md-6"
-                                placeholder="0.00" />
+                            <x-form.textbox labelName="Cost" name="cost" required="required" col="col-md-6"
+                            placeholder="0.00" />
 
-                                <x-form.textbox labelName="Price" name="price" required="required" col="col-md-6"
-                                placeholder="0.00" />
+                            <x-form.textbox labelName="Price" name="price" required="required" col="col-md-6"
+                            placeholder="0.00" />
 
-                                <x-form.textbox labelName="Quantity" name="qty" col="col-md-6"
-                                placeholder="0.00" />
+                            <x-form.textbox labelName="Quantity" name="qty" col="col-md-6"
+                            placeholder="0.00" />
 
-                                <x-form.textbox labelName="Alert Quantity" name="alert_qty" col="col-md-6"
-                                placeholder="0.00" />
+                            <x-form.textbox labelName="Alert Quantity" name="alert_qty" col="col-md-6"
+                            placeholder="0.00" />
 
 
-                                <div class="form-group col-md-6">
-                                  <label for="">Tax</label>
-                                  <select name="tax_id" id="tax_id" class="form-control selectpicker" required="required" data-live-search="true"
-                                  data-live-search-placeholder="Search">
+                            <div class="form-group col-md-6">
+                                <label for="">Tax</label>
+                                <select name="tax_id" id="tax_id" class="form-control selectpicker" required="required" data-live-search="true"
+                                    data-live-search-placeholder="Search">
                                     <option value="">No Tax</option>
                                     @if (!$taxes->isEmpty())
                                     @foreach ($taxes as $tax)
@@ -98,13 +98,13 @@
                                     @endforeach
                                     @endif
                                 </select>
-                                </div>
+                            </div>
 
-                                <x-form.selectbox labelName="Tax Method" name="tax_method" required="required" col="col-md-6"
-                                class="selectpicker">
-                                @foreach (TAX_METHOD as $key => $method)
-                                <option value="{{ $key }}" {{ $key == 1 ? 'selected' : '' }}>{{ $method }}</option>
-                                @endforeach
+                            <x-form.selectbox labelName="Tax Method" name="tax_method" required="required" col="col-md-6"
+                            class="selectpicker">
+                            @foreach (TAX_METHOD as $key => $method)
+                            <option value="{{ $key }}" {{ $key == 1 ? 'selected' : '' }}>{{ $method }}</option>
+                            @endforeach
                             </x-form.selectbox>
 
                             <x-form.textarea labelName="Description" name="description" col="col-md-6" />

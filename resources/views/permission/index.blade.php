@@ -51,7 +51,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="module_id">Module</label>
-                                <select name="module_id" id="module_id" class="form-control selectpicker" data-live-search-placeholder="Search" title="Choose one of the following">
+                                <select name="module_id" id="module_id" class="form-control selectpicker" data-live-search-placeholder="Search" data-live-search="true" title="Choose one of the following">
                                     <option value="">Select Please</option>
                                     @if (!empty($data['modules']))
                                         @foreach ($data['modules'] as $key => $item)

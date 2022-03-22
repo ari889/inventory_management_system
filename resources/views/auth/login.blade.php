@@ -8,11 +8,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>JustLog - Login</title>
+    <title>{{ config('settings.title') ? config('settings.title') : env('APP_NAME') }} - @yield('title')</title>
 
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="32x32" href="images/fev.png">
- 
+
     <!-- Custom Stylesheet -->
     <link type="text/css" rel="stylesheet" href="css/login.css">
 
