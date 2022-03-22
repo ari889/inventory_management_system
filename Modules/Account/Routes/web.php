@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,6 +13,15 @@
 |
 */
 
-Route::prefix('account')->group(function() {
-    Route::get('/', 'AccountController@index');
+Route::group(['middleware' => ['auth']], function(){
+    Route::get('account', 'AccountController@index')->name('account');
+    Route::group(['prefix' => 'account', 'as' => 'account.'], function(){
+        Route::post('datatable-data', 'AccountController@get_datatable_data')->name('datatable.data');
+        Route::post('store-or-update', 'AccountController@store_or_update_data')->name('store.or.update');
+        Route::post('edit', 'AccountController@edit')->name('edit');
+        Route::post('delete', 'AccountController@delete')->name('delete');
+        Route::post('bulk-delete', 'AccountController@bulk_delete')->name('bulk.delete');
+        Route::post('change-status', 'AccountController@change_status')->name('change.status');
+    });
 });
+
