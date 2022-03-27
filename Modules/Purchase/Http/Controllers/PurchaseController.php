@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Modules\System\Entities\Tax;
 use Modules\System\Entities\Unit;
 use Illuminate\Support\Facades\DB;
+use Modules\Account\Entities\Account;
 use Modules\Product\Entities\Product;
 use Modules\System\Entities\Warehouse;
 use Modules\Purchase\Entities\Purchase;
@@ -29,7 +30,8 @@ class PurchaseController extends BaseController
         if(permission('purchase-access')){
             $this->setPageData('Manage Purchase', 'Manage Purchase', 'fas fa-box');
             $suppliers = Supplier::all();
-            return view('purchase::index', compact('suppliers'));
+            $accounts = Account::where('status', 1)->get();
+            return view('purchase::index', compact('suppliers', 'accounts'));
         }else{
             return $this->unauthorized_access_blocked();
         }
@@ -76,7 +78,12 @@ class PurchaseController extends BaseController
                         $action .= ' <a class="dropdown-item invoice_data"  data-id="' . $value->id . '"><i class="fas fa-file text-warning"></i> Invoice</a>';
                     }
                     if(permission('purchase-payment-add')){
-                        $action .= ' <a class="dropdown-item invoice_data"  data-id="' . $value->id . '"><i class="fas fa-plus-square text-info"></i> Add Payment</a>';
+                        if(($value->grand_total - $value->paid_amount) != 0){
+                            $action .= ' <a class="dropdown-item add_payment"  data-id="' . $value->id . '" data-due="'.($value->grand_total - $value->paid_amount).'"><i class="fas fa-plus-square text-info"></i> Add Payment</a>';
+                        }
+                    }
+                    if(permission('purchase-payment-view')){
+                        $action .= ' <a class="dropdown-item view_payment_list"  data-id="' . $value->id . '"><i class="fas fa-file-invoice-dollar text-default"></i> Payment List</a>';
                     }
                     if(permission('purchase-delete')){
                         $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '"><i class="fas fa-trash text-danger"></i> Delete</a>';

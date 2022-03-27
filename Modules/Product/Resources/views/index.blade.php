@@ -465,33 +465,33 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.view_data', function () {
-            let id = $(this).data('id');
-            if (id) {
-                $.ajax({
-                    url: "{{route('product.show')}}",
-                    type: "POST",
-                    data: {
-                        id: id,
-                        _token: _token
-                    },
-                    success: function (data) {
-                        $('#view_modal .details').html();
-                        $('#view_modal .details').html(data);
+        let id = $(this).data('id');
+        if (id) {
+            $.ajax({
+                url: "{{route('product.show')}}",
+                type: "POST",
+                data: {
+                    id: id,
+                    _token: _token
+                },
+                success: function (data) {
+                    $('#view_modal .details').html();
+                    $('#view_modal .details').html(data);
 
-                        $('#view_modal').modal({
-                            keyboard: false,
-                            backdrop: 'static',
-                        });
-                        $('#view_modal .modal-title').html(
-                            '<i class="fas fa-eye"></i> <span>Supplier Details</span>');
+                    $('#view_modal').modal({
+                        keyboard: false,
+                        backdrop: 'static',
+                    });
+                    $('#view_modal .modal-title').html(
+                        '<i class="fas fa-eye"></i> <span>Supplier Details</span>');
 
-                    },
-                    error: function (xhr, ajaxOption, thrownError) {
-                        console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
-                    }
-                });
-            }
-        });
+                },
+                error: function (xhr, ajaxOption, thrownError) {
+                    console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+                }
+            });
+        }
+    });
 
 });
 
