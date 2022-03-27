@@ -3,9 +3,9 @@
 namespace Modules\Purchase\Entities;
 
 use Modules\Base\Entities\BaseModel;
+use Modules\Account\Entities\Payment;
 use Modules\Product\Entities\Product;
 use Modules\Supplier\Entities\Supplier;
-use Modules\System\Entities\Warehouse;
 
 class Purchase extends BaseModel
 {
@@ -20,6 +20,10 @@ class Purchase extends BaseModel
         return $this->belongsToMany(Product::class, 'purchase_products', 'purchase_id', 'product_id', 'id', 'id')
         ->withPivot(['qty', 'received', 'unit_id', 'net_unit_cost', 'discount', 'tax_rate', 'tax', 'total'])
         ->withTimestamps();
+    }
+
+    public function payments(){
+        return $this->hasMany(Payment::class);
     }
 
     protected $purchase_no;
