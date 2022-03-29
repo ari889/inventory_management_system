@@ -72,7 +72,7 @@ class BrandController extends BaseController
         if($request->ajax()){
             if(permission('brand-add') || permission('brand-edit')){
                 $collection = collect($request->validated())->only('title');
-                $collection = $this->track_data($request->update_id,$collection);
+                $collection = $this->track_data($collection, $request->update_id);
                 $image = $request->old_image;
                 if($request->hasFile('image')){
                     $image = $this->upload_file($request->file('image'),BRAND_IMAGE_PATH);

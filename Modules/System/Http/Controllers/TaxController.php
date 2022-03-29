@@ -70,7 +70,7 @@ class TaxController extends BaseController
         if($request->ajax()){
             if(permission('tax-add') || permission('tax-edit')){
                 $collection = collect($request->validated());
-                $collection = $this->track_data($request->update_id, $collection);
+                $collection = $this->track_data($collection, $request->update_id);
                 $result     = $this->model->updateOrCreate(['id' => $request->update_id], $collection->all());
                 $output     = $this->store_message($result, $request->update_id);
             }else{

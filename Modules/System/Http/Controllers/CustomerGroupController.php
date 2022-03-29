@@ -72,7 +72,7 @@ class CustomerGroupController extends BaseController
                 $collection = collect($request->validated())->except('percentage');
                 $percentage = $request->percentage ? $request->percentage : null;
                 $collection = $collection->merge(compact('percentage'));
-                $collection = $this->track_data($request->update_id, $collection);
+                $collection = $this->track_data($collection, $request->update_id);
                 $result     = $this->model->updateOrCreate(['id' => $request->update_id], $collection->all());
                 $output     = $this->store_message($result, $request->update_id);
             }else{

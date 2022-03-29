@@ -1,40 +1,35 @@
 <?php
 
-namespace Modules\System\Http\Controllers;
+namespace Modules\Expense\Http\Controllers;
 
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Modules\System\Entities\Warehouse;
 use Modules\Base\Http\Controllers\BaseController;
-use Modules\System\Http\Requests\WarehouseFormRequest;
+use Modules\Expense\Entities\ExpenseCategory;
+use Modules\Expense\Http\Requests\ExpenseCategoryFormRequest;
 
-class WarehouseController extends BaseController
+class ExpenseCategoryController extends BaseController
 {
-    public function __construct(Warehouse $model)
+    public function __construct(ExpenseCategory $model)
     {
         $this->model = $model;
     }
 
     public function index()
     {
-        if(permission('warehouse-access')){
-            $this->setPageData('Warehouse', 'Warehouse', 'fas fa-th-percent');
-            return view('system::warehouse.index');
+        if(permission('expense-category-access')){
+            $this->setPageData('Expense Category', 'Expense Category', 'fas fa-th-list');
+            return view('expense::category.index');
         }else{
             return $this->unauthorized_access_blocked();
         }
     }
 
     public function get_datatable_data(Request $request){
-        if(permission('warehouse-access')){
+        if(permission('expense-category-access')){
             if($request->ajax()){
                 if (!empty($request->name)) {
                     $this->model->setName($request->name);
-                }
-                if (!empty($request->phone)) {
-                    $this->model->setPhone($request->phone);
-                }
-                if (!empty($request->email)) {
-                    $this->model->setEmail($request->email);
                 }
 
                 $this->set_datatable_default_property($request);
@@ -45,23 +40,20 @@ class WarehouseController extends BaseController
                 foreach ($list as $value) {
                     $no++;
                     $action = '';
-                    if(permission('warehouse-edit')){
+                    if(permission('expense-category-edit')){
                         $action .= ' <a class="dropdown-item edit_data" data-id="' . $value->id . '"><i class="fas fa-edit text-primary"></i> Edit</a>';
                     }
-                    if(permission('warehouse-delete')){
+                    if(permission('expense-category-delete')){
                         $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '"><i class="fas fa-trash text-danger"></i> Delete</a>';
                     }
 
                     $row = [];
-                    if(permission('warehouse-bulk-delete')){
+                    if(permission('expense-category-bulk-delete')){
                         $row[] = table_checkbox($value->id);
                     }
                     $row[] = $no;
                     $row[] = $value->name;
-                    $row[] = $value->phone;
-                    $row[] = $value->email;
-                    $row[] = $value->address;
-                    $row[] = permission('warehouse-edit') ? change_status($value->id, $value->status, $value->name) : STATUS_LABEL[$value->status];
+                    $row[] = permission('expense-category-edit') ? change_status($value->id, $value->status, $value->name) : STATUS_LABEL[$value->status];
                     $row[] = action_button($action);
                     $data[] = $row;
                 }
@@ -74,9 +66,9 @@ class WarehouseController extends BaseController
         }
     }
 
-    public function store_or_update_data(WarehouseFormRequest $request){
+    public function store_or_update_data(ExpenseCategoryFormRequest $request){
         if($request->ajax()){
-            if(permission('warehouse-add') || permission('warehouse-edit')){
+            if(permission('expense-category-add') || permission('expense-category-edit')){
                 $collection = collect($request->validated());
                 $collection = $this->track_data($collection, $request->update_id);
                 $result     = $this->model->updateOrCreate(['id' => $request->update_id], $collection->all());
@@ -92,7 +84,7 @@ class WarehouseController extends BaseController
 
     public function edit(Request $request){
         if($request->ajax()){
-            if(permission('warehouse-edit')){
+            if(permission('expense-category-edit')){
                 $data = $this->model->findOrFail($request->id);
                 $output = $this->data_message($data);
             }else{
@@ -106,7 +98,7 @@ class WarehouseController extends BaseController
 
     public function delete(Request $request){
         if($request->ajax()){
-            if(permission('warehouse-delete')){
+            if(permission('expense-category-delete')){
                 $result = $this->model->find($request->id)->delete();
                 $output = $this->delete_message($result);
             }else{
@@ -120,7 +112,7 @@ class WarehouseController extends BaseController
 
     public function bulk_delete(Request $request){
         if($request->ajax()){
-            if(permission('warehouse-bulk-delete')){
+            if(permission('expense-category-bulk-delete')){
                 $result = $this->model->destroy($request->ids);
                 $output = $this->bulk_delete_message($result);
             }else{
@@ -134,7 +126,7 @@ class WarehouseController extends BaseController
 
     public function change_status(Request $request){
         if($request->ajax()){
-            if(permission('warehouse-edit')){
+            if(permission('expense-category-edit')){
                 $result = $this->model->find($request->id)->update(['status' => $request->status]);
                 $output = $result ? ['status' => 'success', 'message' => 'Status has been changed!'] : ['status' => 'error', 'message' => 'Failed to update status!'];
             }else{
