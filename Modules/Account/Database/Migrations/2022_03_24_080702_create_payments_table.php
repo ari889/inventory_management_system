@@ -19,6 +19,8 @@ class CreatePaymentsTable extends Migration
             $table->foreign('account_id')->references('id')->on('accounts');
             $table->unsignedBigInteger('purchase_id')->nullable();
             $table->foreign('purchase_id')->references('id')->on('purchases');
+            $table->unsignedBigInteger('sale_id')->nullable();
+            $table->foreign('sale_id')->references('id')->on('sales');
             $table->double('amount');
             $table->double('change')->nullable();
             $table->enum('payment_method', ['1', '2', '3'])->default('1')->comment('1=Casg,2=Cheque.3=Mobile');

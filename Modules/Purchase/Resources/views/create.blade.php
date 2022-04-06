@@ -177,7 +177,7 @@
                             </div>
                             <div class="form-group col-md-12 text-center">
                                 <button class="btn btn-danger btn-sm" id="reset-btn" type="button">Reset</button>
-                                <button class="btn btn-primary btn-sm" id="save-btn" type="button">Update</button>
+                                <button class="btn btn-primary btn-sm" id="save-btn" type="button">Save</button>
                             </div>
                         </div>
                     </form>
@@ -676,6 +676,16 @@
                 rowindex = $(this).closest('tr').index();
                 $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.received').val($(this).val());
             });
+        }
+    });
+
+    $(document).on('change', '#payment_method', function(){
+        if($('#payment_method option:selected').val() != 1){
+            var method = $('#payment_method option:selected').val() == 2 ?'Cheque' : 'Mobile';
+            $('#method-name').text(method);
+            $('.payment_no').removeClass('d-none');
+        }else{
+            $('.payment_no').addClass('d-none');
         }
     });
 

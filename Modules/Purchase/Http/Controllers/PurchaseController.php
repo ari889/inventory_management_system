@@ -338,7 +338,7 @@ class PurchaseController extends BaseController
                     }
 
                     $purchase = $purchaseData->update($purchase_data);
-                    if($purchase && $old_document){
+                    if($purchase && $old_document != ''){
                         $this->delete_file($old_document, PURCHASE_DOCUMENT_PATH);
                     }
                     $purchaseData->purchase_products()->sync($products);

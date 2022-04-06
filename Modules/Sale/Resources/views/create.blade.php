@@ -43,8 +43,8 @@
                     </h2>
                 </div>
                 <!-- /entry heading -->
-                @if (permission('purchase-add'))
-                <a href="{{ route('purchase') }}" class="btn btn-warning btn-sm"><i
+                @if (permission('sale-add'))
+                <a href="{{ route('sale') }}" class="btn btn-warning btn-sm"><i
                         class="fas fa-arow-left mr-2"></i>Back</a>
                 @endif
 
@@ -57,16 +57,9 @@
                 <!-- Card Body -->
                 <div class="dt-card__body">
 
-                    <form id="purchase-form">
+                    <form id="sale-form">
                         @csrf
                         <div class="row">
-                            <input type="hidden" name="purchase_id" value="{{ $purchase->id }}">
-                            <input type="hidden" name="warehouse_id_hidden" value="{{ $purchase->warehouse_id }}">
-                            <input type="hidden" name="supplier_id_hidden" value="{{ $purchase->supplier_id }}">
-                            <input type="hidden" name="purchase_status_hidden" value="{{ $purchase->purchase_status }}">
-                            <input type="hidden" name="order_tax_rate_hidden" value="{{ $purchase->order_tax_rate }}">
-
-
                             <x-form.selectbox labelName="Warehouse" name="warehouse_id" required="required" col="col-md-6" class="selectpicker">
                                 @if (!$warehouses->isEmpty())
                                     @foreach ($warehouses as $warehouse)
@@ -74,25 +67,14 @@
                                     @endforeach
                                 @endif
                             </x-form.selectbox>
-                            <x-form.selectbox labelName="Supplier" name="supplier_id"  required="required" col="col-md-6" class="selectpicker">
-                                @if (!$suppliers->isEmpty())
-                                    @foreach ($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}">{{ $supplier->name }}
-                                            {{ $supplier->company_name ? ' - '.$supplier->company_name : '' }}</option>
+                            <x-form.selectbox labelName="Customer" name="customer_id"  required="required" col="col-md-6" class="selectpicker">
+                                @if (!$customers->isEmpty())
+                                    @foreach ($customers as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }}
+                                            {{ $customer->company_name ? ' - '.$customer->company_name : '' }}</option>
                                     @endforeach
                                 @endif
                             </x-form.selectbox>
-                            <x-form.selectbox labelName="Purchase Status" name="purchase_status"  required="required" col="col-md-6" class="selectpicker">
-                                    @foreach (PURCHASE_STATUS as $key => $value)
-                                        <option value="{{ $key }}" {{ $key == 1 ? 'selected' : '' }}>{{ $value }}</option>
-                                    @endforeach
-                            </x-form.selectbox>
-
-                            <div class="form-group col-md-6">
-                                <label for="document">Attach Document</label>
-                                <input type="file" class="form-control" name="document" id="document"
-                                    class="form-control">
-                            </div>
                             <div class="form-group col-md-12">
                                 <label for="product_code_name">Search Product</label>
                                 <div class="input-group">
@@ -112,98 +94,20 @@
                                         <th>Code</th>
                                         <th class="text-center">Unit</th>
                                         <th class="text-center">Quantity</th>
-                                        <th class="text-center d-none received-product-qty">Received</th>
-                                        <th class="text-right">Net Unit Cost</th>
+                                        <th class="text-right">Net Unit Price</th>
                                         <th class="text-right">Discount</th>
                                         <th class="text-right"> Tax</th>
                                         <th class="text-right">Subtotal</th>
                                         <th></th>
                                     </thead>
-                                    <tbody>
-                                        @php
-                                            $temp_unit_name            = [];
-                                            $temp_unit_operator        = [];
-                                            $temp_unit_operation_value = [];
-                                        @endphp
-                                        @if (!$purchase->purchase_products->isEmpty())
-                                            @foreach ($purchase->purchase_products as $key => $purchase_product)
-                                                <tr>
-                                                    @php
-                                                        $tax = DB::table('taxes')->where('rate', $purchase_product->pivot->tax_rate)->first();
-
-                                                        $units = DB::table('units')->where('base_unit', $purchase_product->unit_id)
-                                                                                    ->orWhere('id', $purchase_product->unit_id)
-                                                                                    ->get();
-                                                        $unit_name            = [];
-                                                        $unit_operator        = [];
-                                                        $unit_operation_value = [];
-
-                                                        if($units){
-                                                            foreach ($units as $unit) {
-                                                                if($purchase_product->pivot->unit_id == $unit->id){
-                                                                    array_unshift($unit_name, $unit->unit_name);
-                                                                    array_unshift($unit_operator, $unit->operator);
-                                                                    array_unshift($unit_operation_value, $unit->operation_value);
-                                                                }else{
-                                                                    $unit_name           [] = $unit->unit_name;
-                                                                    $unit_operator       [] = $unit->operator;
-                                                                    $unit_operation_value[] = $unit->operation_value;
-                                                                }
-                                                            }
-                                                            if($purchase_product->tax_method == 1){
-                                                                $product_cost = ($purchase_product->pivot->net_unit_cost + ($purchase_product->pivot->discount / $purchase_product->pivot->qty)) / $unit_operation_value[0];
-                                                            }else{
-                                                                $product_cost = (($purchase_product->pivot->total + ($purchase_product->pivot->discount / $purchase_product->pivot->qty)) / $purchase_product->pivot->qty) / $unit_operation_value[0];
-                                                            }
-
-                                                            $temp_unit_name            = $unit_name            = implode(",", $unit_name).',';
-                                                            $temp_unit_operator        = $unit_operator        = implode(",", $unit_operator).',';
-                                                            $temp_unit_operation_value = $unit_operation_value = implode(",", $unit_operation_value).',';
-                                                        }
-                                                    @endphp
-                                                    <td>{{ $purchase_product->name }}</td>
-
-                                                    <td>{{ $purchase_product->code }}</td>
-                                                    <td class="unit-name"></td>
-                                                    <td><input type="text" class="form-control qty text-center" name="products[{{ $key+1 }}][qty]" id="products_{{ $key+1 }}_qty" value="{{ $purchase_product->pivot->qty }}"></td>
-                                                    <td class="received-product-qty d-none"><input type="text" class="form-control received text-center" name="products[{{ $key+1 }}][received]" value="{{ $purchase_product->pivot->received }}"></td>
-                                                    <td class="net_unit_cost text-right">{{ number_format((float)$purchase_product->pivot->net_unit_cost , 2, '.', ',') }}</td>
-                                                    <td class="discount text-right">{{ number_format((float)$purchase_product->pivot->discount , 2, '.', ',') }}</td>
-                                                    <td class="tax text-right">{{ number_format((float)$purchase_product->pivot->tax , 2, '.', ',') }}</td>
-                                                    <td class="sub-total text-right">{{ number_format((float)$purchase_product->pivot->total , 2, '.', ',') }}</td>
-                                                    <td>
-                                                        <button type="button" class="edit-product btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i></button>
-                                                        <button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button>
-                                                    </td>
-                                                    <input type="hidden" class="product-id" name="products[{{ $key+1 }}][id]"  value="{{ $purchase_product->id }}">
-                                                    <input type="hidden" class="product-code" name="products[{{ $key+1 }}][code]" value="{{ $purchase_product->code }}">
-                                                    <input type="hidden" class="product-cost" name="products[{{ $key+1 }}][cost]" value="{{ $product_cost }}">
-                                                    <input type="hidden" class="purchase-unit" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}">
-                                                    <input type="hidden" class="purchase-unit-operator" value="{{ $unit_operator }}">
-                                                    <input type="hidden" class="purchase-unit-operation-value" value="{{ $unit_operation_value }}">
-                                                    <input type="hidden" class="net_unit_cost" name="products[{{ $key+1 }}][net_unit_cost]" value="{{ $purchase_product->pivot->net_unit_cost }}">
-                                                    <input type="hidden" class="discount-value" name="products[{{ $key+1 }}][discount]" value="{{ $purchase_product->pivot->discount }}">
-                                                    <input type="hidden" class="tax-rate" name="products[{{ $key+1 }}][tax_rate]" value="{{ $purchase_product->pivot->tax_rate }}">
-                                                    @if ($tax)
-                                                    <input type="hidden" class="tax-name" value="{{ $tax->name }}">
-                                                    @else
-                                                    <input type="hidden" class="tax-name" value="No Tax">
-                                                    @endif
-                                                    <input type="hidden" class="tax-method" value="{{ $purchase_product->tax_method }}">
-                                                    <input type="hidden" class="tax-value" name="products[{{ $key+1 }}][tax]" value="{{ $purchase_product->pivot->tax }}">
-                                                    <input type="hidden" class="subtotal-value" name="products[{{ $key+1 }}][subtotal]" value="{{ $purchase_product->pivot->total }}">
-                                                </tr>
-                                            @endforeach
-                                        @endif
-                                    </tbody>
+                                    <tbody></tbody>
                                     <tfoot class="bg-primary">
                                         <th colspan="3">Total</th>
-                                        <th id="total-qty" class="text-center">{{ $purchase->total_qty }}</th>
-                                        <th class="d-none received-product-qty"></th>
+                                        <th id="total-qty" class="text-center">0</th>
                                         <th></th>
-                                        <th id="total-discount" class="text-right">{{ number_format($purchase->total_discount, 2, '.', ',') }}</th>
-                                        <th id="total-tax" class="text-right">{{ number_format($purchase->total_tax, 2, '.', ',') }}</th>
-                                        <th id="total" class="text-right">{{ number_format($purchase->total_cost, 2, '.', ',') }}</th>
+                                        <th id="total-discount" class="text-right">0.00</th>
+                                        <th id="total-tax" class="text-right">0.00</th>
+                                        <th id="total" class="text-right">0.00</th>
                                         <th></th>
                                     </tfoot>
                                 </table>
@@ -212,23 +116,73 @@
                                 class="selectpicker">
                                 <option value="0" selected>No Tax</option>
                                 @if(!$taxes->isEmpty())
-                                @foreach($taxes as $tax)
-                                <option value="{{ $tax->rate }}">{{ $tax->name }}</option>
-                                @endforeach
+                                    @foreach($taxes as $tax)
+                                        <option value="{{ $tax->rate }}">{{ $tax->name }}</option>
+                                    @endforeach
                                 @endif
                             </x-form.selectbox>
 
                             <div class="form-group col-md-4">
                                 <label for="order_discount">Order Discount</label>
-                                <input type="number" class="form-control" name="order_discount" id="order_discount" class="form-control" value="{{ $purchase->order_discount }}">
+                                <input type="number" class="form-control" name="order_discount" id="order_discount"
+                                    class="form-control">
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="shipping_cost">Shipping Cost</label>
-                                <input type="number" class="form-control" name="shipping_cost" id="shipping_cost" class="form-control" value="{{ $purchase->shipping_cost }}">
+                                <input type="number" class="form-control" name="shipping_cost" id="shipping_cost"
+                                    class="form-control">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="document">Attach Document</label>
+                                <input type="file" class="form-control" name="document" id="document"
+                                    class="form-control">
+                            </div>
+                            <x-form.selectbox labelName="Sale Status" name="sale_status"  required="required" col="col-md-4" class="selectpicker">
+                                @foreach (SALE_STATUS as $key => $value)
+                                    <option value="{{ $key }}">{{ $value }}</option>
+                                @endforeach
+                            </x-form.selectbox>
+                            <div class="form-group col-md-4 d-none payment_status required">
+                                <label for="payment_status">Payment Status</label>
+                                <select name="payment_status" class="form-control" id="payment_status">
+                                    <option value="">Select Please</option>
+                                    <option value="1">Paid</option>
+                                    <option value="2">Partial</option>
+                                    <option value="3">Due</option>
+                                </select>
+                            </div>
+                            <div class="payment col-md-12 d-none">
+                                <div class="row">
+                                    <x-form.selectbox labelName="Payment Method" name="payment_method" required="required" col="col-md-4" class="selectpicker">
+                                        @foreach (PAYMENT_METHOD as $key => $value)
+                                        <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </x-form.selectbox>
+                                    <x-form.selectbox labelName="Account" name="account_id" required="required" col="col-md-4" class="selectpicker">
+                                        @if (!$accounts->isEmpty())
+                                        @foreach ($accounts as $account)
+                                        <option value="{{ $account->id }}">{{ $account->name.' - '.$account->account_no }}</option>
+                                        @endforeach
+                                        @endif
+                                    </x-form.selectbox>
+                                    <div class="form-group col-md-4 payment_no d-none">
+                                        <label for="payment_no"><span id="method-name"></span> No</label>
+                                        <input type="text" class="form-control" name="payment_no" id="payment_no">
+                                    </div>
+                                    <x-form.textbox labelName="Received Amount" name="paying_amount" required="required" col="col-md-4" />
+                                    <div class="form-group col-md-4 required">
+                                        <label for="paid_amount">Paying Amount</label>
+                                        <input type="text" name="paid_amount" id="paid_amount" class="form-control">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="change_amount">Change Amount</label>
+                                        <input type="text" name="change_amount" id="change_amount" class="form-control" readonly>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group col-md-12">
                                 <label for="note">Note</label>
-                                <textarea name="note" id="note" cols="30" rows="3" class="form-control">{{ $purchase->note }}</textarea>
+                                <textarea name="note" id="note" cols="30" rows="3" class="form-control"></textarea>
                             </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered">
@@ -248,18 +202,17 @@
                                 </table>
                             </div>
                             <div class="col-md-12">
-                                <input type="hidden" name="total_qty" value="{{ $purchase->total_qty }}">
-                                <input type="hidden" name="total_discount" value="{{ $purchase->total_discount }}">
-                                <input type="hidden" name="total_tax" value="{{ $purchase->total_tax }}">
-                                <input type="hidden" name="total_cost" value="{{ $purchase->total_cost }}">
-                                <input type="hidden" name="item" value="{{ $purchase->item }}">
-                                <input type="hidden" name="order_tax" value="{{ $purchase->order_tax }}">
-                                <input type="hidden" name="grand_total" value="{{ $purchase->grand_total }}">
-                                <input type="hidden" name="paid_amount" value="{{ $purchase->paid_amount }}">
+                                <input type="hidden" name="total_qty">
+                                <input type="hidden" name="total_discount">
+                                <input type="hidden" name="total_tax">
+                                <input type="hidden" name="total_price">
+                                <input type="hidden" name="item">
+                                <input type="hidden" name="order_tax">
+                                <input type="hidden" name="grand_total">
                             </div>
                             <div class="form-group col-md-12 text-center">
                                 <button class="btn btn-danger btn-sm" id="reset-btn" type="button">Reset</button>
-                                <button class="btn btn-primary btn-sm" id="save-btn" type="button">Update</button>
+                                <button class="btn btn-primary btn-sm" id="save-btn" type="button">Save</button>
                             </div>
                         </div>
                     </form>
@@ -345,6 +298,18 @@
 <script src="js/jquery-ui.min.js"></script>
 <script>
     $(document).ready(function () {
+        $('#product_code_name').on('input', function(){
+            var customer_id  = $('#customer_id option:selected').val();
+            var warehouse_id  = $('#warehouse_id option:selected').val();
+            var temp_data = $('#product_code_name').val();
+            if(!warehouse_id){
+                $('#product_code_name').val(temp_data.substring(0, temp_data.length - 1));
+                notification('error', 'Please select warehouse');
+            }else if(!customer_id){
+                $('#product_code_name').val(temp_data.substring(0, temp_data.length - 1));
+                notification('error', 'Please select customer');
+            }
+        });
         $('#product_code_name').autocomplete({
             source: function (request, response) {
                 $.ajax({
@@ -353,7 +318,8 @@
                     dataType: 'JSON',
                     data: {
                         _token: _token,
-                        search: request.term
+                        search: request.term,
+                        warehouse_id : $('#warehouse_id option:selected').val()
                     },
                     success: function (data) {
                         response(data);
@@ -380,12 +346,13 @@
         };
 
         // array data depend on warehouse
+        var product_array = [];
         var product_code = [];
         var product_name = [];
         var product_qty = [];
 
         // array data with selection
-        var product_cost = [];
+        var product_price = [];
         var product_discount = [];
         var tax_rate = [];
         var tax_name = [];
@@ -401,85 +368,22 @@
         var temp_unit_operation_value = [];
 
         var rowindex;
-        var row_product_cost;
+        var customer_group_rate;
+        var row_product_price;
+        var pos;
 
-        var rownumber = $('#product-list tbody tr:last').index();
-        for (rowindex = 0; rowindex <= rownumber; rowindex++) {
-            product_cost.push(parseFloat($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.product-cost').val()));
-            var total_discount = parseFloat($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text());
-            var quantity = parseFloat($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val());
-            product_discount.push((total_discount / quantity).toFixed(2));
-            tax_rate.push(parseFloat($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-rate').val()));
-            tax_name.push($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-name').val());
-            tax_method.push($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-method').val());
-            temp_unit_name = $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit').val().split(',');
-            unit_name.push($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit').val());
-            unit_operator.push($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit-operator').val());
-            unit_operation_value.push($('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit-operation-value').val());
-            $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit').val(temp_unit_name[0]);
-            $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.unit-name').text(temp_unit_name[0]);
-        }
-
-        //assign value
-        $('select[name="supplier_id"]').val($('input[name="supplier_id_hidden"]').val());
-        $('select[name="warehouse_id"]').val($('input[name="warehouse_id_hidden"]').val());
-        $('select[name="purchase_status"]').val($('input[name="purchase_status_hidden"]').val());
-        $('select[name="order_tax_rate"]').val($('input[name="order_tax_rate_hidden"]').val());
-        $('.selectpicker').selectpicker('refresh');
-
-        $('#item').text($('input[name="item"]').val() + '('+$('input[name="total_qty"]').val()+')');
-        $('#subtotal').text(parseFloat($('input[name="total_cost"]').val()).toFixed(2));
-        $('#order_total_tax').text(parseFloat($('input[name="order_tax"]').val()).toFixed(2));
-
-        if($('#purchase_status option:selected').val() == 2){
-            $('.received-product-qty').removeClass('d-none');
-        }
-
-        if(!$('input[name="order_discount"]').val()){
-            $('input[name="order_discount"]').val('0.00')
-        }
-
-        $('#order_discount').text(parseFloat($('input[name="order_discount"]').val()).toFixed(2));
-
-        if(!$('input[name="shipping_cost"]').val()){
-            $('input[name="shipping_cost"]').val('0.00')
-        }
-
-        $('#shipping_total_cost').text(parseFloat($('input[name="shipping_cost"]').val()).toFixed(2));
-        $('#grand_total').text(parseFloat($('input[name="grand_total"]').val()).toFixed(2));
+        $('#customer_id').on('change', function(){
+            var id = $(this).val();
+            $.get('{{ url("customer/group-data") }}/'+id, function(data){
+                customer_group_rate = (data/100);
+                console.log(customer_group_rate)
+            });
+        });
 
         // edit product
         $('#product-list').on('click', '.edit-product', function(){
             rowindex = $(this).closest('tr').index();
-            var row_product_name = $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(1)').text();
-            var row_product_code = $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(2)').text();
-            $('#model-title').text(row_product_name+'('+row_product_code+')');
-
-            var qty = $(this).closest('tr').find('.qty').val();
-            $('#edit_qty').val(qty);
-            $('#edit_discount').val(parseFloat(product_discount[rowindex]).toFixed(2));
-
-            unitConversion();
-            $('#edit_unit_cost').val(row_product_cost.toFixed(2));
-
-            var tax_name_all = <?php echo json_encode($tax_name_all) ?>;
-            var pos = tax_name_all.indexOf(tax_name[rowindex]);
-            $('#edit_tax_rate').val(pos);
-
-            temp_unit_name = (unit_name[rowindex]).split(',');
-            temp_unit_name.pop();
-            temp_unit_operator = (unit_operator[rowindex]).split(',');
-            temp_unit_operator.pop();
-            temp_unit_operation_value = (unit_operation_value[rowindex]).split(',');
-            temp_unit_operation_value.pop();
-
-            $('#edit_unit').empty();
-
-            $.each(temp_unit_name, function(key, value){
-                $('#edit_unit').append('<option value="'+key+'">'+value+'</option>')
-            });
-
-            $('.selectpicker').selectpicker('refresh');
+            edit();
         });
 
         // update edit product data
@@ -509,9 +413,9 @@
 
             if(row_unit_operator == '*')
             {
-                product_cost[rowindex] = $('#edit_unit_cost').val() / row_unit_operation_value;
+                product_price[rowindex] = $('#edit_unit_cost').val() / row_unit_operation_value;
             }else{
-                product_cost[rowindex] = $('#edit_unit_cost').val() * row_unit_operation_value;
+                product_price[rowindex] = $('#edit_unit_cost').val() * row_unit_operation_value;
             }
 
             product_discount[rowindex] = $('#edit_discount').val();
@@ -519,7 +423,7 @@
             var temp_operator = temp_unit_operator[position];
             var temp_operation_value = temp_unit_operation_value[position];
 
-            $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.purchase-unit').val(temp_unit_name[position]);
+            $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.sale-unit').val(temp_unit_name[position]);
             temp_unit_name.splice(position,1);
             temp_unit_operator.splice(position,1);
             temp_unit_operation_value.splice(position,1);
@@ -544,7 +448,8 @@
 
         $('#product-list').on('click', '.remove-product', function(){
             rowindex = $(this).closest('tr').index();
-            product_cost.splice(rowindex, 1);
+            product_price.splice(rowindex, 1);
+            product_qty.splice(rowindex, 1);
             product_discount.splice(rowindex, 1);
             tax_rate.splice(rowindex, 1);
             tax_name.splice(rowindex, 1);
@@ -556,17 +461,13 @@
             calculateTotal();
         });
 
-        @if(!$purchase->purchase_products->isEmpty())
-        var count = "{{ count($purchase->purchase_products) + 1 }}";
-        @else
         var count = 1;
-        @endif
 
         function product_search(data) {
             $.ajax({
                 url: "{{ url('product-search') }}",
                 type:"POST",
-                data:{data:data,_token:_token,type:'purchase'},
+                data:{data:data,_token:_token,warehouse_id : $('#warehouse_id option:selected').val(), type: 'sale'},
                 success: function(data)
                 {
                     var flag = 1;
@@ -575,7 +476,7 @@
                             rowindex = i;
                             var qty = parseFloat($('#product-list tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
                             $('#product-list tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
-                            calculateProductData(qty);
+                            checkQuantity(String(qty), true);
                             flag = 0;
                         }
                     });
@@ -591,18 +492,8 @@
                         cols += `<td class="unit-name"></td>`;
                         cols += `<td><input type="text" class="form-control qty text-center" name="products[`+count+`][qty]"
                             id="products_`+count+`_qty" value="1"></td>`;
-                        if($('#purchase_status option:selected').val() == 1)
-                        {
-                            cols += `<td class="received-product-qty d-none"><input type="text" class="form-control received text-center"
-                                name="products[`+count+`][received]" value="1"></td>`;
-                        }else if($('#purchase_status option:selected').val() == 2){
-                            cols += `<td class="received-product-qty"><input type="text" class="form-control received text-center"
-                                name="products[`+count+`][received]" value="1"></td>`;
-                        }else{
-                            cols += `<td class="received-product-qty d-none"><input type="text" class="form-control received text-center"
-                                name="products[`+count+`][received]" value="0"></td>`;
-                        }
-                        cols += `<td class="net_unit_cost text-right"></td>`;
+
+                        cols += `<td class="net_unit_price text-right"></td>`;
                         cols += `<td class="discount text-right"></td>`;
                         cols += `<td class="tax text-right"></td>`;
                         cols += `<td class="sub-total text-right"></td>`;
@@ -610,16 +501,19 @@
                             data-target="#editModal"><i class="fas fa-edit"></i></button>
                             <button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button></td>`;
                         cols += `<input type="hidden" class="product-id" name="products[`+count+`][id]"  value="`+data.id+`">`;
+                        cols += `<input type="hidden" class="stock-qty" name="products[`+count+`][stock_qty]"  value="`+data.qty+`">`;
                         cols += `<input type="hidden" class="product-code" name="products[`+count+`][code]" value="`+data.code+`">`;
                         cols += `<input type="hidden" class="product-unit" name="products[`+count+`][unit]" value="`+temp_unit_name[0]+`">`;
-                        cols += `<input type="hidden" class="net_unit_cost" name="products[`+count+`][net_unit_cost]">`;
+                        cols += `<input type="hidden" class="net_unit_price" name="products[`+count+`][net_unit_price]">`;
                         cols += `<input type="hidden" class="discount-value" name="products[`+count+`][discount]">`;
                         cols += `<input type="hidden" class="tax-rate" name="products[`+count+`][tax_rate]" value="`+data.tax_rate+`">`;
                         cols += `<input type="hidden" class="tax-value" name="products[`+count+`][tax]">`;
                         cols += `<input type="hidden" class="subtotal-value" name="products[`+count+`][subtotal]">`;
                         newRow.append(cols);
                         $('#product-list tbody').append(newRow);
-                        product_cost.push(parseFloat(data.cost));
+
+                        product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                        product_qty.push(data.qty);
                         product_discount.push('0.00');
                         tax_rate.push(parseFloat(data.tax_rate));
                         tax_name.push(data.tax_name);
@@ -628,37 +522,77 @@
                         unit_operator.push(data.unit_operator);
                         unit_operation_value.push(data.unit_operation_value);
                         rowindex = newRow.index();
-                        calculateProductData(1);
+                        checkQuantity(1, true);
                         count++;
                     }
                 }
             });
         }
 
-        function checkQuantity(purchase_qty, flag){
+        function checkQuantity(sale_qty, flag){
             var row_product_code = $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(2)').text();
-            var pos = product_code.indexOf(row_product_code);
             var operator = unit_operator[rowindex].split(',');
             var operation_value = unit_operation_value[rowindex].split(',');
             if(operator[0] == '*')
             {
-                total_qty = purchase_qty * operation_value[0];
+                total_qty = sale_qty * operation_value[0];
             }else if(operator[0] == '/'){
-                total_qty = purchase_qty / operation_value[0];
+                total_qty = sale_qty / operation_value[0];
             }
-            $('#editModal').modal('hide');
-            $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(purchase_qty);
-            var status = $('#purchase_status option:selected').val();
-            if(status == '1' || status == '2'){
-                $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.received').val(purchase_qty);
-            }
-            calculateProductData(purchase_qty);
 
+            if(total_qty > parseFloat(product_qty[rowindex])){
+                notification('error', 'Quantity exced stock quantity');
+                if(flag){
+                    sale_qty = sale_qty.substring(0, sale_qty.length - 1);
+                    $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
+                }else{
+                    edit();
+                    return;
+                }
+            }
+            if(!flag){
+                $('#editModal').modal('hide');
+                $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
+            }
+            calculateProductData(sale_qty);
+
+        }
+
+        function edit(){
+            var row_product_name = $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(1)').text();
+            var row_product_code = $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(2)').text();
+            $('#model-title').text(row_product_name+'('+row_product_code+')');
+
+            var qty = $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val();
+            $('#edit_qty').val(qty);
+            $('#edit_discount').val(parseFloat(product_discount[rowindex]).toFixed(2));
+
+            unitConversion();
+            $('#edit_unit_cost').val(row_product_price.toFixed(2));
+
+            var tax_name_all = <?php echo json_encode($tax_name_all) ?>;
+            var pos = tax_name_all.indexOf(tax_name[rowindex]);
+            $('#edit_tax_rate').val(pos);
+
+            temp_unit_name = (unit_name[rowindex]).split(',');
+            temp_unit_name.pop();
+            temp_unit_operator = (unit_operator[rowindex]).split(',');
+            temp_unit_operator.pop();
+            temp_unit_operation_value = (unit_operation_value[rowindex]).split(',');
+            temp_unit_operation_value.pop();
+
+            $('#edit_unit').empty();
+
+            $.each(temp_unit_name, function(key, value){
+                $('#edit_unit').append('<option value="'+key+'">'+value+'</option>')
+            });
+
+            $('.selectpicker').selectpicker('refresh');
         }
 
     function calculateProductData(quantity) {
         unitConversion();
-        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(7)').text((
+        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(6)').text((
             product_discount[rowindex] * quantity).toFixed(2));
         $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.discount-value').val((
             product_discount[rowindex] * quantity).toFixed(2));
@@ -666,24 +600,24 @@
         $('#product-list tbody tr:nth-child('+(rowindex + 1)+')').find('.unit-name').text(unit_name[rowindex].slice(0,unit_name[rowindex].indexOf(",")));
 
         if (tax_method[rowindex] == 1) {
-            var net_unit_cost = row_product_cost - product_discount[rowindex];
-            var tax = net_unit_cost * quantity * (tax_rate[rowindex] / 100);
-            var sub_total = (net_unit_cost * quantity) + tax;
+            var net_unit_price = row_product_price - product_discount[rowindex];
+            var tax = net_unit_price * quantity * (tax_rate[rowindex] / 100);
+            var sub_total = (net_unit_price * quantity) + tax;
         } else {
-            var sub_total_unit = row_product_cost - product_discount[rowindex];
-            var net_unit_cost = (100 / (100 + tax_rate[rowindex])) * sub_total_unit;
-            var tax = (sub_total_unit - net_unit_cost) * quantity;
+            var sub_total_unit = row_product_price - product_discount[rowindex];
+            var net_unit_price = (100 / (100 + tax_rate[rowindex])) * sub_total_unit;
+            var tax = (sub_total_unit - net_unit_price) * quantity;
             var sub_total = sub_total_unit * quantity;
         }
 
-        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(6)').text(net_unit_cost
+        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(5)').text(net_unit_price
             .toFixed(2));
-        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.net_unit_cost').val(net_unit_cost
+        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.net_unit_price').val(net_unit_price
             .toFixed(2));
-        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(8)').text(tax.toFixed(
+        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(7)').text(tax.toFixed(
             2));
         $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-value').val(tax.toFixed(2));
-        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(9)').text(sub_total
+        $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(8)').text(sub_total
             .toFixed(2));
         $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.subtotal-value').val(sub_total
             .toFixed(2));
@@ -697,9 +631,9 @@
             .indexOf(','));
         row_unit_operation_value = parseFloat(row_unit_operation_value);
         if (row_unit_operator == '*') {
-            row_product_cost = product_cost[rowindex] * row_unit_operation_value;
+            row_product_price = product_price[rowindex] * row_unit_operation_value;
         } else {
-            row_product_cost = product_cost[rowindex] / row_unit_operation_value;
+            row_product_price = product_price[rowindex] / row_unit_operation_value;
         }
     }
 
@@ -741,7 +675,7 @@
         });
 
         $('#total').text(total.toFixed(2));
-        $('input[name="total_cost"]').val(total);
+        $('input[name="total_price"]').val(total);
 
         calculateGrandTotal();
     }
@@ -749,7 +683,7 @@
     function calculateGrandTotal() {
         var item = $('#product-list tbody tr:last').index();
         var total_qty = parseFloat($('#total-qty').text());
-        var subtotal = parseFloat($('input[name="total_cost"]').val());
+        var subtotal = parseFloat($('input[name="total_price"]').val());
         var order_tax = parseFloat($('select[name="order_tax_rate"]').val());
         var order_discount = parseFloat($('#order_discount').val());
         var shipping_cost = parseFloat($('#shipping_cost').val());
@@ -775,7 +709,10 @@
         $('#shipping_total_cost').text(shipping_cost.toFixed(2));
         $('#grand_total').text(grand_total.toFixed(2));
         $('input[name="grand_total"]').val(grand_total.toFixed(2));
-
+        if($('#payment_status option:selected').val() == 1){
+            $('#paying_amount').val('');
+            $('#paying_amount').val(grand_total.toFixed(2));
+        }
     }
 
 
@@ -787,25 +724,49 @@
         calculateGrandTotal();
     });
 
-    $('#purchase_status').on('change', function(){
-        var status = $('#purchase_status option:selected').val();
-        if(status == 2){
-            $('.received-product-qty').removeClass('d-none');
-            $('.qty').each(function(){
-                rowindex = $(this).closest('tr').index();
-                $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.received').val($(this).val());
-            });
-        }else if(status == 3 || status == 4){
-            $('.received-product-qty').addClass('d-none');
-            $('.received').each(function(){
-                $(this).val(0);
-            });
+    $('#payment_status').on('change', function(){
+        var payment_status = $('#payment_status option:selected').val();
+        if($(this).val() != 3){
+            $('.payment').removeClass('d-none');
+            $('#paying_amount').val($('input[name="grand_total"]').val());
+            $('#paid_amount').val($('input[name="grand_total"]').val());
+            $('#change_amount').val(parseFloat(0).toFixed(2));
         }else{
-            $('.received-product-qty').addClass('d-none');
-            $('.qty').each(function(){
-                rowindex = $(this).closest('tr').index();
-                $('#product-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.received').val($(this).val());
-            });
+            $('.payment').addClass('d-none');
+        }
+    });
+
+    $(document).on('change', '#payment_method', function(){
+        if($('#payment_method option:selected').val() != 1){
+            var method = $('#payment_method option:selected').val() == 2 ?'Cheque' : 'Mobile';
+            $('#method-name').text(method);
+            $('.payment_no').removeClass('d-none');
+        }else{
+            $('.payment_no').addClass('d-none');
+        }
+    });
+
+    $('#paid_amount').on('input', function(){
+        if(parseFloat($('#paid_amount').val()) > parseFloat($('#paying_amount').val())){
+            notification('error', 'Paying amount can\'t be bigger than received amount.');
+            $('#paid_amount').val('');
+        }else if(parseFloat($('#paid_amount').val()) > parseFloat($('#grand_total').text())){
+            notification('error', 'Paying amount can\'t be bigger than grand total.');
+            $('#paid_amount').val('');
+        }
+        $('#change_amount').val((parseFloat($('#paying_amount').val()) - parseFloat($('#paid_amount').val())).toFixed(2));
+    });
+
+    $('#paying_amount').on('input', function(){
+        $('#change_amount').val((parseFloat($('#paying_amount').val()) - parseFloat($('#paid_amount').val())).toFixed(2));
+    });
+
+    $('#sale_status').on('change', function(){
+        if($('#sale_status option:selected').val() == 1){
+            $('.payment_status').removeClass('d-none');
+        }else{
+            $('.payment_status').addClass('d-none');
+            $('.payment_no').addClass('d-none');
         }
     });
 
@@ -816,10 +777,10 @@
         if(rownumber < 0){
             notification('error', 'Please add product to table');
         }else{
-            let form = document.getElementById('purchase-form');
+            let form = document.getElementById('sale-form');
             let formData = new FormData(form);
             $.ajax({
-                url: "{{route('purchase.update')}}",
+                url: "{{route('sale.store')}}",
                 type: "POST",
                 data: formData,
                 dataType: "JSON",
@@ -847,7 +808,7 @@
                     } else {
                         notification(data.status, data.message);
                         if (data.status == 'success') {
-                            window.location.replace('{{ route("purchase") }}');
+                            window.location.replace('{{ route("sale") }}');
                         }
                     }
                 },

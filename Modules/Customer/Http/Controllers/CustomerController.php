@@ -169,4 +169,9 @@ class CustomerController extends BaseController
             return response()->json($this->access_blocked());
         }
     }
+
+    public function groupData(int $id){
+        $data = $this->model->with('customerGroup')->find($id);
+        return $data ? $data->customerGroup->percentage : 0;
+    }
 }
