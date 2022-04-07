@@ -28,6 +28,11 @@ define('PAYMENT_STATUS_LABEL', [
     '1' => '<span class="badge badge-success">Paid</span>',
     '2' => '<span class="badge badge-danger">Due</span>'
 ]);
+define('SALE_PAYMENT_STATUS_LABEL', [
+    '1' => '<span class="badge badge-success">Paid</span>',
+    '2' => '<span class="badge badge-info">Partial</span>',
+    '3' => '<span class="badge badge-danger">Due</span>',
+]);
 define('STATUS_LABEL', ['1' => '<span class="badge badge-success">Active</span>', '2' => '<span class="badge badge-danger">Inactive</span>']);
 define('MAIL_MAILER', ['sendmal', 'mail', 'smtp']);
 define('MAIL_ENCRYPTION', ['none' => 'null', 'tls' => 'tls', 'ssl' => 'ssl']);

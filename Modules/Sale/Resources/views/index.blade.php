@@ -140,7 +140,7 @@
     <!-- /grid -->
     @include('sale::payment.add')
     <!-- start payment view modal -->
-    <div class="modal fade show" id="sale_view_modal" tabindex="-1" role="dialog" aria-labelledby="model-1" aria-modal="true">
+    <div class="modal fade show" id="payment_view_modal" tabindex="-1" role="dialog" aria-labelledby="model-1" aria-modal="true">
         <div class="modal-dialog modal-xl" role="document">
 
             <!-- Modal Content -->
@@ -353,7 +353,7 @@ $(document).ready(function(){
             $('.selectpicker').selectpicker('refresh');
             if (id) {
                 $('#payment_modal #payment_id').val('');
-                $('#payment_modal #purchase_id').val(id);
+                $('#payment_modal #sale_id').val(id);
                 $('#payment_modal #paying_amount').val(due);
                 $('#payment_modal #amount').val(due);
                 $('#payment_modal #balance').val(due);
@@ -369,7 +369,7 @@ $(document).ready(function(){
     //Payment Add Modal Show
     $(document).on('click', '.edit-payment', function () {
         let id = $(this).data('id');
-        let purchase_id = $(this).data('purchaseid');
+        let sale_id = $(this).data('saleid');
         let amount = $(this).data('amount');
         let change = $(this).data('change');
         let payment_method = $(this).data('paymentmethod');
@@ -386,7 +386,7 @@ $(document).ready(function(){
             $('.selectpicker').selectpicker('refresh');
             if (id) {
                 $('#payment_modal #sale_id').val(id);
-                $('#payment_modal #customer_id').val(customer_id);
+                $('#payment_modal #sale_id').val(sale_id);
                 $('#payment_modal #paying_amount').val(paying_amount);
                 $('#payment_modal #amount').val(amount);
                 $('#payment_modal #change_amount').val(change);
@@ -485,7 +485,7 @@ $(document).ready(function(){
     $(document).on('click', '.delete-payment', function(e){
         e.preventDefault();
         let id = $(this).data('id');
-        let purchase_id = $(this).data('purchaseid');
+        let sale_id = $(this).data('saleid');
         Swal.fire({
             title: 'Are you sure to delete  data?',
             text: "You won't be able to revert this!",
@@ -507,7 +507,7 @@ $(document).ready(function(){
                 }).done(function (response) {
                     if (response.status == "success") {
                         Swal.fire("Deleted", response.message, "success").then(function () {
-                            payment_list(purchase_id);
+                            payment_list(sale_id);
                             table.ajax.reload(null, false);
                         });
                     }

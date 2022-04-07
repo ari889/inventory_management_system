@@ -18,8 +18,8 @@
                 <form id="payment_form" method="POST">
                     @csrf
                     <div class="row">
-                        <input type="hidden" name="payment_id" id="sale_id">
-                        <input type="hidden" name="purchase_id" id="customer_id">
+                        <input type="hidden" name="payment_id" id="payment_id">
+                        <input type="hidden" name="sale_id" id="sale_id">
                         <input type="hidden" name="balance" id="balance">
                         <x-form.textbox labelName="Received Amount" name="paying_amount" required="required" col="col-md-12" />
                         <div class="form-group col-md-12 required">

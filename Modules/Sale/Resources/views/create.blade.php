@@ -729,7 +729,7 @@
         if($(this).val() != 3){
             $('.payment').removeClass('d-none');
             $('#paying_amount').val($('input[name="grand_total"]').val());
-            $('#paid_amount').val($('input[name="grand_total"]').val());
+            $('#paid_amount').val($('input[name="paid_amount"]').val());
             $('#change_amount').val(parseFloat(0).toFixed(2));
         }else{
             $('.payment').addClass('d-none');

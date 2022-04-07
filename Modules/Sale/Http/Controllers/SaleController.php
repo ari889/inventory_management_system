@@ -111,7 +111,7 @@ class SaleController extends BaseController
                     $row [] = number_format($value->paid_amount,2,'.',',');
                     $row [] = number_format(($value->grand_total - $value->paid_amount),2,'.',',');
                     $row [] = Sale_STATUS_LABEL[$value->sale_status];
-                    $row [] = PAYMENT_STATUS_LABEL[$value->payment_status];
+                    $row [] = SALE_PAYMENT_STATUS_LABEL[$value->payment_status];
                     $row [] = $value->created_by;
                     $row [] = date(config('settings.date_format'),strtotime($value->created_at));
                     $row [] = action_button($action);
