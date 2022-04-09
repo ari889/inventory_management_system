@@ -23,6 +23,10 @@ define('Sale_STATUS_LABEL', [
     '1' => '<span class="badge badge-success">Complete</span>',
     '2' => '<span class="badge badge-danger">Pending</span>'
 ]);
+define('ATTENDANCE_STATUS_LABEL', [
+    '1' => '<span class="badge badge-success">Present</span>',
+    '2' => '<span class="badge badge-danger">Late</span>'
+]);
 define('DELETABLE', ['1' => 'no', '2' => 'yes']);
 define('PAYMENT_STATUS', ['1' => 'Paid', '2' => 'Due']);
 define('PAYMENT_STATUS_LABEL', [
