@@ -65,4 +65,8 @@ Route::group(['middleware' => ['auth']], function(){
         Route::post('change-status', 'UnitController@change_status')->name('change.status');
         Route::post('base-unit', 'UnitController@base_unit')->name('base.unit');
     });
+
+    // HRM setting routes
+    Route::get('hrm-setting', 'HRMSettingController@index');
+    Route::post('hrm-setting/store', 'HRMSettingController@store')->name('hrm.store');
 });
