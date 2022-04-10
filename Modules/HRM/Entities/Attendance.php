@@ -40,7 +40,7 @@ class Attendance extends BaseModel
          * *Search Data **
          ******************/
         if (!empty($this->_employee_id)) {
-            $query->where('employee_id', 'like', '%' . $this->_employee_id . '%');
+            $query->where('employee_id', $this->_employee_id);
         }
         if (!empty($this->_fromDate)) {
             $query->where('date', '>=', $this->_fromDate);

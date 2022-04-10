@@ -23,7 +23,7 @@ class CreatePaymentsTable extends Migration
             $table->foreign('sale_id')->references('id')->on('sales');
             $table->double('amount');
             $table->double('change')->nullable();
-            $table->enum('payment_method', ['1', '2', '3'])->default('1')->comment('1=Casg,2=Cheque.3=Mobile');
+            $table->enum('payment_method', ['1', '2', '3'])->default('1')->comment('1=Cash,2=Cheque.3=Mobile');
             $table->string('payment_no')->nullable();
             $table->text('payment_note')->nullable();
             $table->string('created_by')->nullable();

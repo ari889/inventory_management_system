@@ -2,7 +2,7 @@
 
 namespace Modules\HRM\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FormRequest;
 
 class PayrollFormRequest extends FormRequest
 {
@@ -14,7 +14,10 @@ class PayrollFormRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'employee_id'    => 'required',
+            'account_id'     => 'required',
+            'amount'         => 'required|numeric|gt:0',
+            'payment_method' => 'required',
         ];
     }
 
