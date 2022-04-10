@@ -23,5 +23,6 @@ Route::group(['middleware' => ['auth']], function(){
         Route::post('bulk-delete', 'AccountController@bulk_delete')->name('bulk.delete');
         Route::post('change-status', 'AccountController@change_status')->name('change.status');
     });
+    Route::get('balance-sheet', 'AccountController@balance_sheet')->name('balance.sheet');
 });
 
