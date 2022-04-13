@@ -19,4 +19,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::post('summary-report/details', 'SummaryReportController@details')->name('summary.report.details');
 
     Route::match(['get', 'post'], 'product-report', 'ProductReportController@index');
+
+    Route::get('daily-sale', 'SaleReportController@dailySale');
+    Route::post('daily-sale', 'SaleReportController@dailySaleReport')->name('daily.sale.report');
 });

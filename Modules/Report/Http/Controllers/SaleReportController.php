@@ -2,78 +2,83 @@
 
 namespace Modules\Report\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Sale\Entities\Sale;
+use Modules\System\Entities\Warehouse;
 
 class SaleReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    protected function setPageData($page_title,$sub_title,$page_icon)
     {
-        return view('report::index');
+        view()->share(['page_title'=>$page_title,'sub_title'=>$sub_title,'page_icon'=>$page_icon]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function dailySale()
     {
-        return view('report::create');
+        if(permission('daily-sale-access')){
+            $this->setPageData('Daily Sale Report', 'Daily Sale Report', 'fas fa-file-signature');
+            $warehouses = Warehouse::where('status', 1)->get();
+            return view('report::sale.daily.index', compact('warehouses'));
+        }else{
+            return redirect('unauthorized');
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
+     * daily sales post method
      */
-    public function show($id)
-    {
-        return view('report::show');
-    }
+    public function dailySaleReport(Request $request){
+        if($request->ajax())
+        {
+            $warehouse_id = $request->warehouse_id;
+            $month        = $request->month;
+            $year         = $request->year;
+            $start        = 1;
+            $number_of_day  = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            $total_discount = [];
+            $order_discount = [];
+            $total_tax     = [];
+            $order_tax      = [];
+            $shipping_cost  = [];
+            $grand_total    = [];
+            while ($start <= $number_of_day) {
+                $date =  ($start < 10) ? $year.'-'.$month.'-0'.$start : $year.'-'.$month.'-'.$start;
+                $query = [
+                    'SUM(total_discount) AS total_discount',
+                    'SUM(order_discount) AS order_discount',
+                    'SUM(total_tax) AS total_tax',
+                    'SUM(order_tax) AS order_tax',
+                    'SUM(shipping_cost) AS shipping_cost',
+                    'SUM(grand_total) AS grand_total',
+                ];
+                $sale_data = Sale::whereDate('created_at',$date)->selectRaw(implode(',',$query));
+                if($warehouse_id  != 0)
+                {
+                   $sale_data->where('warehouse_id',$warehouse_id);
+                }
+                $sale_data = $sale_data->get();
+                if($sale_data)
+                {
+                    $total_discount[$start] = $sale_data[0]->total_discount;
+                    $order_discount[$start] = $sale_data[0]->order_discount;
+                    $total_tax[$start] = $sale_data[0]->total_tax;
+                    $order_tax[$start] = $sale_data[0]->order_tax;
+                    $shipping_cost[$start] = $sale_data[0]->shipping_cost;
+                    $grand_total[$start] = $sale_data[0]->grand_total;
+                }
+                $start++;
+            }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('report::edit');
-    }
+            $start_day = date('w',strtotime($year.'-'.$month.'-01')) + 1;
+            $prev_year = date('Y',strtotime('-1 month',strtotime($year.'-'.$month.'-01')));
+            $prev_month = date('m',strtotime('-1 month',strtotime($year.'-'.$month.'-01')));
+            $next_year = date('Y',strtotime('+1 month',strtotime($year.'-'.$month.'-01')));
+            $next_month = date('m',strtotime('+1 month',strtotime($year.'-'.$month.'-01')));
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+            return view('report::sale.daily.report',compact('total_discount','order_discount','total_tax','order_tax','shipping_cost','grand_total',
+            'start_day','year','month','number_of_day','prev_year','prev_month','next_year','next_month'))->render();
+        }
     }
 }
