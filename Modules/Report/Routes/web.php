@@ -22,4 +22,7 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::get('daily-sale', 'SaleReportController@dailySale');
     Route::post('daily-sale', 'SaleReportController@dailySaleReport')->name('daily.sale.report');
+    
+    Route::get('monthly-sale', 'SaleReportController@monthlySale');
+    Route::post('monthly-sale', 'SaleReportController@monthlySaleReport')->name('monthly.sale.report');
 });

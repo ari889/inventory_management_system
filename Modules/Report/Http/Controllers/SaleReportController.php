@@ -81,4 +81,74 @@ class SaleReportController extends Controller
             'start_day','year','month','number_of_day','prev_year','prev_month','next_year','next_month'))->render();
         }
     }
+
+    public function monthlySale()
+    {
+        if(permission('monthly-sale-access')){
+
+            $this->setPageData('Monthly Sale Report','Monthly Sale Report','fas fa-file-signature');
+            $warehouses = Warehouse::where('status',1)->get();
+            return view('report::sale.monthly.index',compact('warehouses'));
+        }else{
+            return redirect('unauthorized');
+        }
+    }
+
+    public function monthlySaleReport(Request $request)
+    {
+        if($request->ajax())
+        {
+            $warehouse_id = $request->warehouse_id;
+            $year         = $request->year;
+            $start = strtotime($year.'-01-01');
+            $end = strtotime($year.'-12-31');
+            $total_discount = [];
+            $order_discount = [];
+            $total_tax = [];
+            $order_tax = [];
+            $shipping_cost = [];
+            $grand_total = [];
+            while ($start <= $end) {
+                $start_date = $year.'-'.date('m',$start).'-'.'01';
+                $end_date = $year.'-'.date('m',$end).'-'.'31';
+
+                $temp_total_discount = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_order_discount = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_total_tax = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_order_tax = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_shipping_cost = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_grand_total = Sale::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                if($warehouse_id  != 0)
+                {
+                    $temp_total_discount->where('warehouse_id',$warehouse_id);
+                    $temp_order_discount->where('warehouse_id',$warehouse_id);
+                    $temp_total_tax->where('warehouse_id',$warehouse_id);
+                    $temp_order_tax->where('warehouse_id',$warehouse_id);
+                    $temp_shipping_cost->where('warehouse_id',$warehouse_id);
+                    $temp_grand_total->where('warehouse_id',$warehouse_id);
+                }
+                $temp_total_discount =  $temp_total_discount->sum('total_discount');
+                $total_discount[] = number_format((float)$temp_total_discount,2,'.',',');
+
+                $temp_order_discount =  $temp_order_discount->sum('order_discount');
+                $order_discount[] = number_format((float)$temp_order_discount,2,'.',',');
+
+                $temp_total_tax =  $temp_total_tax->sum('total_tax');
+                $total_tax[] = number_format((float)$temp_total_tax,2,'.',',');
+
+                $temp_order_tax =  $temp_order_tax->sum('order_tax');
+                $order_tax[] = number_format((float)$temp_order_tax,2,'.',',');
+
+                $temp_shipping_cost =  $temp_shipping_cost->sum('shipping_cost');
+                $shipping_cost[] = number_format((float)$temp_shipping_cost,2,'.',',');
+
+                $temp_grand_total =  $temp_grand_total->sum('grand_total');
+                $grand_total[] = number_format((float)$temp_grand_total,2,'.',',');
+
+                $start = strtotime('+1 month',$start);
+            }
+           
+            return view('report::sale.monthly.report',compact('year','total_discount','order_discount','total_tax','order_tax','shipping_cost','grand_total'))->render();
+        }
+    }
 }

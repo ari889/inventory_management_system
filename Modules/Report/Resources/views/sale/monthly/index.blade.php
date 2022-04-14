@@ -71,36 +71,33 @@
 <script>
     var table;
     $(document).ready(function () {
-        daily_report(warehouse_id=0, year="{{ date('Y') }}", date="{{ date('m') }}");
+        monthly_report(warehouse_id=0, year="{{ date('Y') }}");
 
         $(document).on('click', '.previous', function(){
             var year = $('#prev_year').val();
-            var month = $('#prev_month').val();
             var warehouse_id = $('#warehouse_id option:selected').val();
-            daily_report(warehouse_id, year, month);
+            monthly_report(warehouse_id, year);
         });
 
         $(document).on('click', '.next', function(){
             var year = $('#next_year').val();
-            var month = $('#next_month').val();
             var warehouse_id = $('#warehouse_id option:selected').val();
-            daily_report(warehouse_id, year, month);
+            monthly_report(warehouse_id, year);
         });
 
 
         $('#warehouse_id').change(function(){
             var warehouse_id = $('#warehouse_id option:selected').val();
-            daily_report(warehouse_id, year="{{ date('Y') }}", date="{{ date('m') }}");
+            monthly_report(warehouse_id, year="{{ date('Y') }}");
         });
         
-        function daily_report(warehouse_id, year, month){
+        function monthly_report(warehouse_id, year){
             $.ajax({
-                url : "{{ route('daily.sale.report') }}",
+                url : "{{ route('monthly.sale.report') }}",
                 type : 'POST',
                 data : {
                     warehouse_id : warehouse_id,
                     year : year,
-                    month : month,
                     _token : _token
                 },
                 success : function(data){
