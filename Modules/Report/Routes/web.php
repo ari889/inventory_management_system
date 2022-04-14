@@ -20,9 +20,19 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::match(['get', 'post'], 'product-report', 'ProductReportController@index');
 
+    // daily sales
     Route::get('daily-sale', 'SaleReportController@dailySale');
     Route::post('daily-sale', 'SaleReportController@dailySaleReport')->name('daily.sale.report');
     
+    // monthly sales
     Route::get('monthly-sale', 'SaleReportController@monthlySale');
     Route::post('monthly-sale', 'SaleReportController@monthlySaleReport')->name('monthly.sale.report');
+
+    //  customer report
+    Route::get('customer-report', 'CustomerReportController@index');
+    Route::post('customer-report/datatable-data', 'CustomerReportController@get_datatable_data')->name('customer.report.datatable.data');
+
+    //  supplier report
+    Route::get('supplier-report', 'SupplierReportController@index');
+    Route::post('supplier-report/datatable-data', 'SupplierReportController@get_datatable_data')->name('supplier.report.datatable.data');
 });
