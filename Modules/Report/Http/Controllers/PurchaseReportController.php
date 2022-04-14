@@ -2,78 +2,153 @@
 
 namespace Modules\Report\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\System\Entities\Warehouse;
+use Modules\Purchase\Entities\Purchase;
 
 class PurchaseReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    protected function setPageData($page_title,$sub_title,$page_icon)
     {
-        return view('report::index');
+        view()->share(['page_title'=>$page_title,'sub_title'=>$sub_title,'page_icon'=>$page_icon]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function dailyPurchase()
     {
-        return view('report::create');
+        if(permission('daily-purchase-access')){
+            $this->setPageData('Daily Purchase Report', 'Daily Purchase Report', 'fas fa-file-signature');
+            $warehouses = Warehouse::where('status', 1)->get();
+            return view('report::purchase.daily.index', compact('warehouses'));
+        }else{
+            return redirect('unauthorized');
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
+     * daily purchase post method
      */
-    public function show($id)
-    {
-        return view('report::show');
+    public function dailyPurchaseReport(Request $request){
+        if($request->ajax())
+        {
+            $warehouse_id = $request->warehouse_id;
+            $month        = $request->month;
+            $year         = $request->year;
+            $start        = 1;
+            $number_of_day  = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            $total_discount = [];
+            $order_discount = [];
+            $total_tax     = [];
+            $order_tax      = [];
+            $shipping_cost  = [];
+            $grand_total    = [];
+            while ($start <= $number_of_day) {
+                $date =  ($start < 10) ? $year.'-'.$month.'-0'.$start : $year.'-'.$month.'-'.$start;
+                $query = [
+                    'SUM(total_discount) AS total_discount',
+                    'SUM(order_discount) AS order_discount',
+                    'SUM(total_tax) AS total_tax',
+                    'SUM(order_tax) AS order_tax',
+                    'SUM(shipping_cost) AS shipping_cost',
+                    'SUM(grand_total) AS grand_total',
+                ];
+                $purchase_data = Purchase::whereDate('created_at',$date)->selectRaw(implode(',',$query));
+                if($warehouse_id  != 0)
+                {
+                   $purchase_data->where('warehouse_id',$warehouse_id);
+                }
+                $purchase_data = $purchase_data->get();
+                if($purchase_data)
+                {
+                    $total_discount[$start] = $purchase_data[0]->total_discount;
+                    $order_discount[$start] = $purchase_data[0]->order_discount;
+                    $total_tax[$start] = $purchase_data[0]->total_tax;
+                    $order_tax[$start] = $purchase_data[0]->order_tax;
+                    $shipping_cost[$start] = $purchase_data[0]->shipping_cost;
+                    $grand_total[$start] = $purchase_data[0]->grand_total;
+                }
+                $start++;
+            }
+
+            $start_day = date('w',strtotime($year.'-'.$month.'-01')) + 1;
+            $prev_year = date('Y',strtotime('-1 month',strtotime($year.'-'.$month.'-01')));
+            $prev_month = date('m',strtotime('-1 month',strtotime($year.'-'.$month.'-01')));
+            $next_year = date('Y',strtotime('+1 month',strtotime($year.'-'.$month.'-01')));
+            $next_month = date('m',strtotime('+1 month',strtotime($year.'-'.$month.'-01')));
+
+            return view('report::purchase.daily.report',compact('total_discount','order_discount','total_tax','order_tax','shipping_cost','grand_total',
+            'start_day','year','month','number_of_day','prev_year','prev_month','next_year','next_month'))->render();
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function monthlyPurchase()
     {
-        return view('report::edit');
+        if(permission('monthly-purchase-access')){
+
+            $this->setPageData('Monthly Purchase Report','Monthly Purchase Report','fas fa-file-signature');
+            $warehouses = Warehouse::where('status',1)->get();
+            return view('report::purchase.monthly.index',compact('warehouses'));
+        }else{
+            return redirect('unauthorized');
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function monthlyPurchaseReport(Request $request)
     {
-        //
-    }
+        if($request->ajax())
+        {
+            $warehouse_id = $request->warehouse_id;
+            $year         = $request->year;
+            $start = strtotime($year.'-01-01');
+            $end = strtotime($year.'-12-31');
+            $total_discount = [];
+            $order_discount = [];
+            $total_tax = [];
+            $order_tax = [];
+            $shipping_cost = [];
+            $grand_total = [];
+            while ($start <= $end) {
+                $start_date = $year.'-'.date('m',$start).'-'.'01';
+                $end_date = $year.'-'.date('m',$end).'-'.'31';
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+                $temp_total_discount = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_order_discount = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_total_tax = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_order_tax = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_shipping_cost = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                $temp_grand_total = Purchase::whereDate('created_at','>=',$start_date)->whereDate('created_at','<=',$end_date);
+                if($warehouse_id  != 0)
+                {
+                    $temp_total_discount->where('warehouse_id',$warehouse_id);
+                    $temp_order_discount->where('warehouse_id',$warehouse_id);
+                    $temp_total_tax->where('warehouse_id',$warehouse_id);
+                    $temp_order_tax->where('warehouse_id',$warehouse_id);
+                    $temp_shipping_cost->where('warehouse_id',$warehouse_id);
+                    $temp_grand_total->where('warehouse_id',$warehouse_id);
+                }
+                $temp_total_discount =  $temp_total_discount->sum('total_discount');
+                $total_discount[] = number_format((float)$temp_total_discount,2,'.',',');
+
+                $temp_order_discount =  $temp_order_discount->sum('order_discount');
+                $order_discount[] = number_format((float)$temp_order_discount,2,'.',',');
+
+                $temp_total_tax =  $temp_total_tax->sum('total_tax');
+                $total_tax[] = number_format((float)$temp_total_tax,2,'.',',');
+
+                $temp_order_tax =  $temp_order_tax->sum('order_tax');
+                $order_tax[] = number_format((float)$temp_order_tax,2,'.',',');
+
+                $temp_shipping_cost =  $temp_shipping_cost->sum('shipping_cost');
+                $shipping_cost[] = number_format((float)$temp_shipping_cost,2,'.',',');
+
+                $temp_grand_total =  $temp_grand_total->sum('grand_total');
+                $grand_total[] = number_format((float)$temp_grand_total,2,'.',',');
+
+                $start = strtotime('+1 month',$start);
+            }
+           
+            return view('report::purchase.monthly.report',compact('year','total_discount','order_discount','total_tax','order_tax','shipping_cost','grand_total'))->render();
+        }
     }
 }
