@@ -406,9 +406,9 @@
                                             <td colspan="2" class="text-right">DISCOUNT</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 'suffix')
-                                                    {{ number_format($sale->discount, 2) }} {{ config('settings.currency_symbol') }}
+                                                    {{ number_format($sale->total_discount, 2) }} {{ config('settings.currency_symbol') }}
                                                 @else
-                                                {{ config('settings.currency_symbol') }} {{ number_format($sale->discount, 2) }}
+                                                {{ config('settings.currency_symbol') }} {{ number_format($sale->total_discount, 2) }}
                                                 @endif
                                             </td>
                                         </tr>
@@ -461,9 +461,9 @@
                                             <td colspan="2" class="text-right">DUE AMOUNT</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 'suffix')
-                                                    {{ number_format(($sale->grand_total -$sale->paid_amount), 2) }} {{ config('settings.currency_symbol') }}
+                                                    {{ number_format(($sale->grand_total - $sale->paid_amount), 2) }} {{ config('settings.currency_symbol') }}
                                                 @else
-                                                {{ config('settings.currency_symbol') }} {{ number_format(($sale->grand_total -$sale->paid_amount), 2) }}
+                                                {{ config('settings.currency_symbol') }} {{ number_format(($sale->grand_total - $sale->paid_amount), 2) }}
                                                 @endif
                                             </td>
                                         </tr>

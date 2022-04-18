@@ -406,9 +406,9 @@
                                             <td colspan="2" class="text-right">DISCOUNT</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 'suffix')
-                                                    {{ number_format($purchase->discount, 2) }} {{ config('settings.currency_symbol') }}
+                                                    {{ number_format($purchase->total_discount, 2) }} {{ config('settings.currency_symbol') }}
                                                 @else
-                                                {{ config('settings.currency_symbol') }} {{ number_format($purchase->discount, 2) }}
+                                                {{ config('settings.currency_symbol') }} {{ number_format($purchase->total_discount, 2) }}
                                                 @endif
                                             </td>
                                         </tr>
@@ -461,7 +461,7 @@
                                             <td colspan="2" class="text-right">DUE AMOUNT</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 'suffix')
-                                                    {{ number_format(($purchase->grand_total -$purchase->paid_amount), 2) }} {{ config('settings.currency_symbol') }}
+                                                    {{ number_format(($purchase->grand_total - $purchase->paid_amount), 2) }} {{ config('settings.currency_symbol') }}
                                                 @else
                                                 {{ config('settings.currency_symbol') }} {{ number_format(($purchase->grand_total - $purchase->paid_amount), 2) }}
                                                 @endif
