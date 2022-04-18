@@ -75,9 +75,6 @@ class SaleController extends BaseController
                     if(permission('sale-view')){
                         $action .= ' <a class="dropdown-item view_data" href="'.route('sale.details', ['id' => $value->id]).'"><i class="fas fa-eye text-success"></i> View</a>';
                     }
-                    if(permission('sale-view')){
-                        $action .= ' <a class="dropdown-item invoice_data"  data-id="' . $value->id . '"><i class="fas fa-file text-warning"></i> Invoice</a>';
-                    }
                     if(permission('sale-payment-add')){
                         if(($value->grand_total - $value->paid_amount) != 0){
                             $action .= ' <a class="dropdown-item add_payment"  data-id="' . $value->id . '" data-due="'.($value->grand_total - $value->paid_amount).'"><i class="fas fa-plus-square text-info"></i> Add Payment</a>';
@@ -262,6 +259,19 @@ class SaleController extends BaseController
                 'taxes'      => Tax::where('status', 1)->get(),
             ];
             return view('sale::edit', $data);
+        }else{
+            return $this->unauthorized_access_blocked();
+        }
+    }
+
+    public function details(int $id)
+    {
+        if(permission('sale-view')){
+            $this->setPageData('Sale Details', 'Sale Details', 'fas fa-eye');
+            $data = [
+                'sale' => $this->model->with('sale_products', 'customer')->find($id),
+            ];
+            return view('sale::details', $data);
         }else{
             return $this->unauthorized_access_blocked();
         }

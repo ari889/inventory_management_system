@@ -74,9 +74,6 @@ class PurchaseController extends BaseController
                     if(permission('purchase-view')){
                         $action .= ' <a class="dropdown-item view_data" href="'.route('purchase.details', ['id' => $value->id]).'"><i class="fas fa-eye text-success"></i> View</a>';
                     }
-                    if(permission('purchase-view')){
-                        $action .= ' <a class="dropdown-item invoice_data"  data-id="' . $value->id . '"><i class="fas fa-file text-warning"></i> Invoice</a>';
-                    }
                     if(permission('purchase-payment-add')){
                         if(($value->grand_total - $value->paid_amount) != 0){
                             $action .= ' <a class="dropdown-item add_payment"  data-id="' . $value->id . '" data-due="'.($value->grand_total - $value->paid_amount).'"><i class="fas fa-plus-square text-info"></i> Add Payment</a>';
@@ -238,6 +235,18 @@ class PurchaseController extends BaseController
                 'taxes'      => Tax::where('status', 1)->get(),
             ];
             return view('purchase::edit', $data);
+        }else{
+            return $this->unauthorized_access_blocked();
+        }
+    }
+
+    public function details(int $id){
+        if(permission('purchase-view')){
+            $this->setPageData('Purchase Details', 'Purchase Details', 'fas fa-eye');
+            $data = [
+                'purchase'   => $this->model->with('purchase_products', 'supplier')->findOrFail($id),
+            ];
+            return view('purchase::details', $data);
         }else{
             return $this->unauthorized_access_blocked();
         }
