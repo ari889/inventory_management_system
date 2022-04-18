@@ -388,21 +388,27 @@ $(document).ready(function(){
         });
 
         $('#image').spartanMultiImagePicker({
-        fieldName: 'image',
-        maxCount: 1,
-        rowHeight: '150px',
-        groupClassName: 'col-md-12 col-sm-12 col-xs-12',
-        maxFileSize: '',
-        dropFileLabel: 'Drop Here',
-        allowExt: 'png|jpg|jpeg',
-        onExtensionErr: function (index, file) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Opps...',
-                text: 'Only png, jpg, jpeg file format are allowed!'
-            });
-        }
-    });
+            fieldName: 'image',
+            maxCount: 1,
+            rowHeight: '150px',
+            groupClassName: 'col-md-12 col-sm-12 col-xs-12',
+            maxFileSize: '',
+            dropFileLabel: 'Drop Here',
+            allowExt: 'png|jpg|jpeg',
+            onExtensionErr: function (index, file) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opps...',
+                    text: 'Only png, jpg, jpeg file format are allowed!'
+                });
+            }
+        });
+
+        $('input[name="image"]').prop('required', true);
+        
+        $('.remove-files').on('click', function(){
+            $(this).parents('.col-md-12').remove();
+        });
 
 });
 </script>

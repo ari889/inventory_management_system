@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FormRequest;
 
 class ProfileUpdateFormRequest extends FormRequest
 {
@@ -13,7 +13,7 @@ class ProfileUpdateFormRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class ProfileUpdateFormRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string',
+            'mobile_no' => 'required|string|max:15|unique:users,mobile_no,'.auth()->user()->id,
+            'avatar' => 'nullable|image|mimes:png,jpg,jpeg,gif',
         ];
     }
 }
