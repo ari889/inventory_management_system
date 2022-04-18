@@ -20,6 +20,7 @@ Auth::routes(['register' => false]);
 
 Route::group(['middleware' => ['auth']], function(){
     Route::get('/', 'HomeController@index')->name('home');
+    Route::get('dashboard-data/{start_date}/{end_date}', 'HomeController@dashboard_data');
     Route::get('unauthorized', 'HomeController@unauthorized')->name('unauthorized');
     Route::get('my-profile', 'MyProfileController@index')->name('my.profile');
     Route::post('update-profile', 'MyProfileController@updateProfile')->name('update.profile');

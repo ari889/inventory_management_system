@@ -28278,7 +28278,7 @@ try {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\laravel-base\resources\js\login.js */"./resources/js/login.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\inventory-management\resources\js\login.js */"./resources/js/login.js");
 
 
 /***/ })
