@@ -45,6 +45,6 @@ Route::group(['middleware' => ['auth']], function(){
     Route::post('supplier-report/datatable-data', 'SupplierReportController@get_datatable_data')->name('supplier.report.datatable.data');
 
     //  product quantity alert report
-    Route::get('supplier-quantity-alert', 'ProductQuantityAlertController@index');
-    Route::post('supplier-quantity-alert/datatable-data', 'ProductQuantityAlertController@get_datatable_data')->name('product.quantity.alert.datatable.data');
+    Route::get('product-quantity-alert', 'ProductQtyAlertController@index');
+    Route::post('product-quantity-alert/datatable-data', 'ProductQtyAlertController@get_datatable_data')->name('product.quantity.alert.datatable.data');
 });
